@@ -1,0 +1,76 @@
+version: "3.8"
+
+#services: permite crear distintos contenedores que se puedan comunicar
+services:
+
+  #IMAGEN POSTGRES
+  postgres:
+    image: postgres
+    restart: always
+    container_name: container-postgres
+    environment:
+      - "POSTGRES_USER= $${POSTGRES_USER}"
+      - "POSTGRES_PASSWORD= $${POSTGRES_PASSWORD}"
+      - "POSTGRES_HOST= $${POSTGRES_HOST}"
+      - "POSTGRES_DB= $${POSTGRES_DB}"
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432   
+    volumes:
+      - "./database:/docker-entrypoint-initdb.d"
+    networks:
+      - my_net   
+
+  #IMAGEN PGADMIN4
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: container-pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "80:80"
+    depends_on:
+      - postgres     
+
+  # IMAGEN BACKEND
+  node:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: container-node  
+    #volumes:
+    #  - "./Backend:/backend"
+    ports:
+      - 4000:4000
+    expose:
+      - 4000
+    depends_on:
+      - postgres     
+    networks:
+      - my_net  
+    
+  # IMAGEN FRONTEND
+  vue:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: container-vue  
+    #volumes:
+    #  - "./Frontkend:/frontend"
+    #  - "/frontend/node_modules"
+    ports:
+    #  - 8081:8081 
+      - 8080:8080
+    expose:
+    ##  - 8081
+      - 8080 
+    depends_on:
+      - node 
+    networks:
+      - my_net  
+  # Para vincular dos contenedores
+networks:
+  my_net:
+    driver: bridge
