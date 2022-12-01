@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 
 import axios from 'axios'
-axios.defaults.baseURL = 'http://localhost:4000' // URL base de la aplicación web (Calendario Diinf)
+axios.defaults.baseURL = 'http://172.18.0.1:4000' // URL base de la aplicación web (Calendario Diinf)
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
